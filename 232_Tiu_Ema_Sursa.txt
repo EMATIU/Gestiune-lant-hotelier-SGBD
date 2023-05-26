@@ -1,0 +1,757 @@
+
+
+create table client(
+id_client number(8,0) primary key,
+nume varchar2(15) not null,
+prenume varchar2(15) not null,
+email varchar2(30),
+telefon varchar2(10) not null,
+id_istoric number(8,0) unique
+);
+
+select * from client;
+drop table client;
+
+create table facilitati(
+id_facilitate number(8,0) primary key,
+denumire varchar2(20) not null,
+cantitate number(2,0) not null
+);
+
+drop table facilitati;
+
+create table tip_camera(
+id_tip number(8,0) primary key,
+tarif number(4,0) not null,
+denumire varchar2(10) not null,
+id_facilitate number(8,0) not null,
+constraint fk_facilitati foreign key (id_facilitate) references facilitati(id_facilitate) on delete cascade
+);
+drop table tip_camera;
+
+create table locatie(
+id_locatie number(8,0) primary key,
+strada varchar2(25) not null,
+nr_strada number(3,0) not null,
+oras varchar2(25) not null
+);
+drop table locatie;
+
+create table job(
+job_id number(8,0) primary key,
+job_titlu varchar2(15) not null,
+min_salariu number(7,0) not null,
+max_salariu number(7,0) not null,
+constraint ck_min_sal check(min_salariu>=2500)
+);
+
+drop table job;
+
+create table departamente(
+departament_id number(8,0) primary key,
+nume_departament varchar2(15) not null,
+manager_id number(8,0)
+);
+
+drop table departamente;
+
+create table hotel(
+id_hotel number(8,0) primary key,
+nume varchar2(15) not null,
+nr_stele number(1,0) not null,
+id_locatie number(8,0) not null,
+constraint fk_locatie foreign key (id_locatie) references locatie(id_locatie) on delete cascade
+);
+drop table hotel;
+
+create table angajat(
+id_angajat number(8,0) primary key,
+id_hotel number(8,0) not null,
+nume varchar2(15) not null,
+prenume varchar2(15) not null,
+job_id number(8,0) not null,
+data_angajare date,
+departament_id number(8,0) not null,
+salariu number(7,0) not null,
+nr_tel varchar2(10) not null,
+manager_id number(8,0) not null,
+constraint ck_sal check(salariu>=2500),
+constraint fk_job foreign key (job_id) references job(job_id) on delete cascade,
+constraint fk_departamente foreign key (departament_id) references departamente(departament_id) on delete cascade,
+constraint fk_hotell foreign key (id_hotel) references hotel(id_hotel) on delete cascade
+);
+
+drop table angajat;
+
+
+create table camera(
+id_camera number(8,0) primary key,
+dimensiune number(2,0) not null,
+capacitate number(2,0) not null,
+nr_camera number(3,0) not null,
+id_tip number(8,0) not null,
+id_hotel number(8,0) not null,
+constraint fk_tipcam_id foreign key (id_tip) references tip_camera(id_tip) on delete cascade,
+constraint fk_hotel_id foreign key (id_hotel) references hotel(id_hotel) on delete cascade
+);
+drop table camera;
+
+create table istoric(
+id_istoric number(8,0) primary key,
+check_in date,
+check_out date,
+id_camera number(8,0) not null,
+constraint fk_camera foreign key (id_camera) references camera(id_camera) on delete cascade
+);
+drop table istoric;
+
+--tabelele asociative:
+
+create table cazat(
+id_client number(8,0),
+id_camera number(8,0),
+data_cazare date,
+nr_nopti number(2,0) not null,
+primary key(id_client, id_camera),
+constraint fk_client1 foreign key(id_client) references client(id_client) on delete cascade,
+constraint fk_camera1 foreign key(id_camera) references camera(id_camera) on delete cascade
+);
+drop table cazat;
+
+create table apartine(
+job_id number(8,0), 
+departament_id number(8,0),
+data_inceput date,
+data_final date,
+primary key(job_id, departament_id),
+constraint fk_departamente1 foreign key(departament_id) references departamente(departament_id) on delete cascade,
+constraint fk_job1 foreign key(job_id) references job(job_id) on delete cascade
+);
+drop table apartine;
+
+commit;
+
+
+
+--INSERARI
+ALTER SESSION SET NLS_DATE_FORMAT = 'DD/MM/YYYY';
+
+--CLIENT
+
+insert into client(id_client, nume, prenume, email, telefon, id_istoric) values (100, 'Tiu', 'Ema', 'ema.tiu@gmail.com','0766812793',1803);
+insert into client(id_client, nume, prenume, email, telefon, id_istoric) values (101, 'Andronache', 'Camelia', 'camelia.andronache@gmail.com','0786844793',1976);
+insert into client(id_client, nume, prenume, email, telefon, id_istoric) values (102, 'Mihalache', 'Andrei', 'andrei_mihalache@yahoo.com','0784778090',1213);
+insert into client(id_client, nume, prenume, email, telefon, id_istoric) values (103, 'Vladescu', 'Robert', 'rrobertvld@gmail.com','0353163227',2388);
+insert into client(id_client, nume, prenume, email, telefon, id_istoric) values (104, 'Marinescu', 'Alexa', 'alexxm@gmail.com','0788832061',6013);
+insert into client(id_client, nume, prenume, email, telefon, id_istoric) values (105, 'Dumitru', 'Alex', 'dumitru_alex11@gmail.com','0761231325',1833);
+insert into client(id_client, nume, prenume, email, telefon, id_istoric) values (106, 'Patrascu', 'Maria', 'patrascumaria@gmail.com','0752112857',2663);
+select* from client;
+
+--FACILITATI
+insert into facilitati(id_facilitate, denumire, cantitate) values (330, 'aer conditionat', 1);
+insert into facilitati(id_facilitate, denumire, cantitate) values (335, 'jacuzzi', 1);
+insert into facilitati(id_facilitate, denumire, cantitate) values (340, 'mini frigider', 2);
+insert into facilitati(id_facilitate, denumire, cantitate) values (345, 'smart tv', 2);
+insert into facilitati(id_facilitate, denumire, cantitate) values (350, 'ciubar pe balcon', 1);
+insert into facilitati(id_facilitate, denumire, cantitate) values (355, 'cuptor electric', 1);
+insert into facilitati(id_facilitate, denumire, cantitate) values (355, 'cuptor cu microunde', 1);
+insert into facilitati(id_facilitate, denumire, cantitate) values (360, 'cabina de dus', 1);
+insert into facilitati(id_facilitate, denumire, cantitate) values (365, 'cada', 1);
+insert into facilitati(id_facilitate, denumire, cantitate) values (370, 'vedere la mare', 1);
+select * from facilitati;
+
+--TIP_CAMERA
+
+insert into tip_camera(id_tip, tarif, denumire, id_facilitate) values (11, 200, 'dubla', 365);
+insert into tip_camera(id_tip, tarif, denumire, id_facilitate) values (12, 310, 'tripla', 345);
+insert into tip_camera(id_tip, tarif, denumire, id_facilitate) values (13, 280, 'tripla', 345);
+insert into tip_camera(id_tip, tarif, denumire, id_facilitate) values (14, 230, 'dubla', 370);
+insert into tip_camera(id_tip, tarif, denumire, id_facilitate) values (15, 230, 'dubla', 340);
+insert into tip_camera(id_tip, tarif, denumire, id_facilitate) values (16, 400, '4 locuri', 340);
+insert into tip_camera(id_tip, tarif, denumire, id_facilitate) values (17, 400, '4 locuri', 350);
+insert into tip_camera(id_tip, tarif, denumire, id_facilitate) values (18, 400, '4 locuri', 370);
+
+select * from tip_camera;
+
+--LOCATIE
+
+insert into locatie(id_locatie, strada, nr_strada, oras) values (200, 'Matache Dobrescu', 2, 'Bucuresti');
+insert into locatie(id_locatie, strada, nr_strada, oras) values (201, 'Unirii', 3, 'Bucuresti');
+insert into locatie(id_locatie, strada, nr_strada, oras) values (202, 'Splaiul Independentei', 5, 'Bucuresti');
+insert into locatie(id_locatie, strada, nr_strada, oras) values (203, 'Drumul Murgului', 1, 'Bucuresti');
+insert into locatie(id_locatie, strada, nr_strada, oras) values (204, 'Odobesti', 6, 'Bucuresti');
+
+select * from locatie;
+
+--JOB
+
+insert into job(job_id, job_titlu, min_salariu, max_salariu) values (710, 'menajera',2500, 3150);
+insert into job(job_id, job_titlu, min_salariu, max_salariu) values (711, 'director igiena',6000, 7300);
+insert into job(job_id, job_titlu, min_salariu, max_salariu) values (712, 'receptioner',2800, 3300);
+insert into job(job_id, job_titlu, min_salariu, max_salariu) values (713, 'paznic',2700, 3500);
+insert into job(job_id, job_titlu, min_salariu, max_salariu) values (714, 'asistent HR',4100, 5000);
+insert into job(job_id, job_titlu, min_salariu, max_salariu) values (715, 'asist_manager',3600, 5500);
+insert into job(job_id, job_titlu, min_salariu, max_salariu) values (716, 'ospatar',4100, 5200);
+insert into job(job_id, job_titlu, min_salariu, max_salariu) values (717, 'bucatar',7000, 10000);
+insert into job(job_id, job_titlu, min_salariu, max_salariu) values (718, 'sef bucatar',15000, 22000);
+
+select * from job;
+
+--DEPARTAMENTE
+
+insert into departamente(departament_id, nume_departament, manager_id) values (10, 'Igiena',180);
+insert into departamente(departament_id, nume_departament, manager_id) values (11, 'Paza',181);
+insert into departamente(departament_id, nume_departament, manager_id) values (12, 'Bucatarie',182);
+insert into departamente(departament_id, nume_departament, manager_id) values (13, 'Receptie',183);
+insert into departamente(departament_id, nume_departament, manager_id) values (14, 'HR',184);
+
+select * from departamente;
+
+--HOTEL
+
+insert into hotel(id_hotel, nume, nr_stele, id_locatie) values (30, 'Hilton', 5, 201);
+insert into hotel(id_hotel, nume, nr_stele, id_locatie) values (31, 'Anna', 3, 203);
+insert into hotel(id_hotel, nume, nr_stele, id_locatie) values (32, 'Europa', 3, 204);
+insert into hotel(id_hotel, nume, nr_stele, id_locatie) values (33, 'Rais', 4, 202);
+insert into hotel(id_hotel, nume, nr_stele, id_locatie) values (34, 'Davios', 2, 200);
+select * from hotel;
+
+--ANGAJAT
+insert into angajat(id_angajat,id_hotel, nume, prenume, job_id, data_angajare, departament_id, salariu, nr_tel, manager_id) values (1100,31, 'Danculea', 'Ana', 710, '11/03/2020',10, 2600, '0253416778',180);
+insert into angajat(id_angajat,id_hotel, nume, prenume, job_id, data_angajare, departament_id, salariu, nr_tel, manager_id) values (1101,31, 'Popescu', 'Ioana', 716, '07/09/2016',12, 4300, '0761833956',182);
+insert into angajat(id_angajat,id_hotel, nume, prenume, job_id, data_angajare, departament_id, salariu, nr_tel, manager_id) values (1102,31, 'Petrescu', 'Marius', 716, '17/11/2018',12, 4150, '0784784156',182);
+insert into angajat(id_angajat,id_hotel, nume, prenume, job_id, data_angajare, departament_id, salariu, nr_tel, manager_id) values (1103,31, 'Popa', 'Mihai', 717, '01/03/2009',12, 8900, '0253997831',182);
+insert into angajat(id_angajat,id_hotel, nume, prenume, job_id, data_angajare, departament_id, salariu, nr_tel, manager_id) values (1104,31, 'Vladoiu', 'Raul', 718, '26/04/2015',12, 20200, '0721154322',182);
+insert into angajat(id_angajat,id_hotel, nume, prenume, job_id, data_angajare, departament_id, salariu, nr_tel, manager_id) values (1105,31, 'Tacu', 'Mircea', 716, '11/08/2020',12, 4100, '0253400778',182);
+insert into angajat(id_angajat,id_hotel, nume, prenume, job_id, data_angajare, departament_id, salariu, nr_tel, manager_id) values (1106,31, 'Baicut', 'Paula', 713, '05/06/2021',11, 3000, '0763416078',181);
+insert into angajat(id_angajat,id_hotel, nume, prenume, job_id, data_angajare, departament_id, salariu, nr_tel, manager_id) values (1107,31, 'Marian', 'Angela', 712, '17/12/2016',13, 3160, '0253432778',183);
+insert into angajat(id_angajat,id_hotel, nume, prenume, job_id, data_angajare, departament_id, salariu, nr_tel, manager_id) values (1108,31, 'Niculescu', 'Ovidiu', 711, '11/08/2020',10, 6500, '0253416778',180);
+insert into angajat(id_angajat,id_hotel, nume, prenume, job_id, data_angajare, departament_id, salariu, nr_tel, manager_id) values (1109,31, 'Baros', 'Horia', 714, '22/09/2020',14, 4970, '0788912003',184);
+insert into angajat(id_angajat,id_hotel, nume, prenume, job_id, data_angajare, departament_id, salariu, nr_tel, manager_id) values (1110,31, 'Pana', 'Mihaela', 717, '30/06/2013',12, 8800, '0253566708',182);
+insert into angajat(id_angajat,id_hotel, nume, prenume, job_id, data_angajare, departament_id, salariu, nr_tel, manager_id) values (1111,31, 'Ciocioman', 'Roxana', 710, '12/01/2010',10, 2550, '0777152988',180);
+insert into angajat(id_angajat,id_hotel, nume, prenume, job_id, data_angajare, departament_id, salariu, nr_tel, manager_id) values (1112,31, 'Opritescu', 'Matei', 715, '05/12/2007',14, 4200, '0714556728',184); 
+select * from angajat;
+
+
+
+--CAMERA
+
+
+insert into camera(id_camera, dimensiune, capacitate, nr_camera, id_tip, id_hotel) values (18200, 30, 2, 20,11,31);
+insert into camera(id_camera, dimensiune, capacitate, nr_camera, id_tip, id_hotel) values (18201, 30, 2, 21,14,31);
+insert into camera(id_camera, dimensiune, capacitate, nr_camera, id_tip, id_hotel) values (18202, 45, 3, 22,13,31);
+insert into camera(id_camera, dimensiune, capacitate, nr_camera, id_tip, id_hotel) values (18203, 45, 3, 23,12,31);
+insert into camera(id_camera, dimensiune, capacitate, nr_camera, id_tip, id_hotel) values (18204, 55, 4, 24,18,31);
+insert into camera(id_camera, dimensiune, capacitate, nr_camera, id_tip, id_hotel) values (18205, 55, 4, 25,16,31);
+insert into camera(id_camera, dimensiune, capacitate, nr_camera, id_tip, id_hotel) values (18206, 30, 2, 26,15,31);
+insert into camera(id_camera, dimensiune, capacitate, nr_camera, id_tip, id_hotel) values (18207, 55, 4, 27,17,31);
+insert into camera(id_camera, dimensiune, capacitate, nr_camera, id_tip, id_hotel) values (18208, 45, 3, 28,13,31);
+
+select * from camera;
+
+--ISTORIC
+
+
+insert into istoric(id_istoric, check_in, check_out, id_camera) values (1803, '12/10/2006','20/10/2006',18200);
+insert into istoric(id_istoric, check_in, check_out, id_camera) values (2663, '01/06/2007','10/06/2007',18207);
+insert into istoric(id_istoric, check_in, check_out, id_camera) values (6013,'01/06/2007','12/06/2007', 18201);
+insert into istoric(id_istoric, check_in, check_out, id_camera) values (1213, '16/10/2011','20/10/2011',18204);
+insert into istoric(id_istoric, check_in, check_out, id_camera) values (1976,'19/08/2007','22/08/2007', 18205);
+
+select * from istoric;
+
+--CAZAT
+
+insert into cazat(id_client, id_camera, data_cazare, nr_nopti) values(105,18201,'23/08/2022',4);
+insert into cazat(id_client, id_camera, data_cazare, nr_nopti) values(105,18204,'30/10/2022',2);
+insert into cazat(id_client, id_camera, data_cazare, nr_nopti) values(103,18203,'23/09/2022',3);
+insert into cazat(id_client, id_camera, data_cazare, nr_nopti) values(103,18207,'11/10/2022',3);
+insert into cazat(id_client, id_camera, data_cazare, nr_nopti) values(104,18202,'01/04/2022',8);
+insert into cazat(id_client, id_camera, data_cazare, nr_nopti) values(102,18205,'03/03/2022',5);
+insert into cazat(id_client, id_camera, data_cazare, nr_nopti) values(101,18206,'29/09/2022',4);
+insert into cazat(id_client, id_camera, data_cazare, nr_nopti) values(100,18206,'01/01/2022',7);
+insert into cazat(id_client, id_camera, data_cazare, nr_nopti) values(106,18208,'23/08/2022',2);
+insert into cazat(id_client, id_camera, data_cazare, nr_nopti) values(100,18207,'14/03/2022',6);
+
+select * from cazat;
+
+--APARTINE
+
+insert into apartine(job_id, departament_id, data_inceput, data_final) values (710,10,'01/10/2005','16/03/2007');
+insert into apartine(job_id, departament_id, data_inceput, data_final) values (711,10,'12/06/2006','12/06/2009');
+insert into apartine(job_id, departament_id, data_inceput, data_final) values (712,13,'04/05/2010','21/03/2015');
+insert into apartine(job_id, departament_id, data_inceput, data_final) values (713,11,'03/10/2005','11/03/2007');
+insert into apartine(job_id, departament_id, data_inceput, data_final) values (713,11,'18/06/2008','16/03/2010');
+insert into apartine(job_id, departament_id, data_inceput, data_final) values (714,14,'19/01/2011','06/10/2013');
+insert into apartine(job_id, departament_id, data_inceput, data_final) values (715,14,'01/10/2005','09/03/2007');
+insert into apartine(job_id, departament_id, data_inceput, data_final) values (716,12,'19/06/2021','11/11/2022');
+insert into apartine(job_id, departament_id, data_inceput, data_final) values (717,12,'02/12/2005','16/05/2007');
+insert into apartine(job_id, departament_id, data_inceput, data_final) values (718,12,'04/10/2010','14/09/2012');
+
+select * from apartine;
+
+commit;
+
+
+----------------------------------------------------------------
+
+--6.Formulați în limbaj natural o problemă pe care să o rezolvați folosind un subprogram stocat
+---independent care să utilizeze două tipuri diferite de colecții studiate. Apelați subprogramul.
+
+Sa se mareasca salariul cu 5% pentru angajatii din departamentul ‘Igiena’ care au fost angajati inainte de anul 2015, iar pentru
+angajatii care au jobul cu id-ul 713 (adica pentru paznici) si au salariul mai mic decat cel mai bine platit din departamentul ‘Igiena’ dupa
+marirea precedenta, sa se realizeze o crestere salariala de 10% si sa se afiseze numele, prenumele si salariul nou pentru toti angajatii
+carora li s-a modificat salariul.
+
+create or replace procedure exercitiul_6 is
+    type tablou_indexat is table of angajat%ROWTYPE index by pls_integer;--utilizez acest tip de colectie pt a crea o lista de asocieri intre indici si valori
+    type tablou_imbricat is table of angajat%ROWTYPE;
+    ang_idx tablou_indexat;
+    ang_imb tablou_imbricat;
+
+    begin
+        
+        select a.id_angajat, a.id_hotel, a.nume, a.prenume,  a.job_id, a.data_angajare, a.departament_id, a.salariu, a.nr_tel, a.manager_id
+        bulk collect into ang_idx
+        from angajat a, departamente d
+        where a.departament_id = d.departament_id
+              and lower(d.nume_departament) = 'igiena' and to_char(a.data_angajare, 'YYYY') <= 2015;
+        
+        dbms_output.put_line('Angajatii de la departamentul de Igiena ale caror salarii au fost modificate sunt:');
+        
+        for i in ang_idx.first..ang_idx.last loop
+            update angajat
+            set salariu = salariu * 1.05
+            where id_angajat = ang_idx(i).id_angajat;
+            dbms_output.put_line(' Nume: ' || ang_idx(i).nume || '     Prenume: ' ||ang_idx(i).prenume ||'    Salariu: ' ||ang_idx(i).salariu);
+        end loop;
+        
+        select a.id_angajat, a.id_hotel, a.nume, a.prenume,  a.job_id, a.data_angajare, a.departament_id, a.salariu, a.nr_tel, a.manager_id
+        bulk collect into ang_imb
+        from angajat a
+        where  a.salariu < (select max(salariu)
+                              from angajat ag, departamente d
+                              where ag.departament_id = d.departament_id and lower(d.nume_departament)='igiena')
+             and a.job_id = 713 ;
+              
+        dbms_output.put_line('');
+        dbms_output.put_line('Angajatii de la departamentul Paza  ale caror salarii au fost modificate sunt:');
+        
+        for i in ang_imb.first..ang_imb.last loop
+            update angajat
+            set salariu = salariu * 1.1
+            where id_angajat = ang_imb(i).id_angajat;
+            dbms_output.put_line(' Nume: ' || ang_imb(i).nume || '   Prenume: ' || ang_imb(i).prenume ||'   Salariu: ' || ang_imb(i).salariu);
+        end loop;
+end exercitiul_6;
+/
+
+begin
+    exercitiul_6;
+end;
+
+rollback;
+
+--7. Formulați în limbaj natural o problemă pe care să o rezolvați folosind un subprogram stocat
+----independent care să utilizeze 2 tipuri diferite de cursoare studiate, unul dintre acestea fiind cursor
+----parametrizat. Apelați subprogramul.
+
+Afisati hotelurile dintr-o locatie data, apoi angajatii tuturor hotelurilor.
+/
+create or replace procedure exercitiul_7(v_loc in locatie.strada%type) is
+    cursor c_hoteluri(v_loc in locatie.strada%type) is
+        select h.nume
+        from hotel h
+        join locatie l on l.id_locatie = h.id_locatie
+        where l.strada = v_loc;
+        
+    
+    cursor c_angajati is
+        select a.nume, a.prenume
+        from  angajat a 
+        join hotel h on a.id_hotel=h.id_hotel
+        join locatie l on l.id_locatie = h.id_locatie
+        where l.strada = v_loc;
+    
+    v_ang c_angajati%rowtype;
+    v_hoteluri c_hoteluri%rowtype;
+    
+begin
+    dbms_output.put_line('Hotelurile localizate pe strada '||v_loc||' din Bucuresti: ');
+    open c_hoteluri(v_loc);
+    loop
+        fetch c_hoteluri into v_hoteluri;
+        exit when c_hoteluri%notfound;
+        dbms_output.put_line('Hotel '|| v_hoteluri.nume);
+    end loop;
+    close c_hoteluri;
+    
+    dbms_output.put_line('--------------Angajati---------------');
+    dbms_output.put_line('');
+    open c_angajati;
+    loop
+        fetch c_angajati into v_ang;
+        exit when c_angajati%notfound;
+        dbms_output.put_line(v_ang.nume||' '||v_ang.prenume);
+    end loop;
+    close c_angajati;
+
+end;
+/
+
+begin
+    exercitiul_7('Drumul Murgului');
+end;
+/
+
+--8. Formulați în limbaj natural o problemă pe care să o rezolvați folosind un subprogram stocat independent de tip funcție
+---care să utilizeze într-o singură comandă SQL 3 dintre tabelele definite. Definiți minim 2 excepții. Apelați subprogramul 
+---astfel încât să evidențiați toate cazurile tratate.
+
+Dandu-se  id-ul camerei ca parametru si stiind ca aceasta face parte din hotelul Anna (id=31), sa se returneze numarul de 
+persoane care s-au cazat in acea camera.
+
+
+Am identificat urmatoarele exceptii:
+1.Nu exista camera cu acel id
+2.Nu s-a cazat nimeni in acea camera
+3.Numarul introdus pentru camera este negativ
+
+
+create or replace procedure exercitiul_8(idc number) is
+    total number(4);
+    type tbl_idx is table of camera%rowtype index by pls_integer;
+    aux tbl_idx;
+    negative_number exception;
+    no_data_found1 exception;
+    no_data_found2 exception;
+    
+    begin
+        if idc<0 then
+            raise negative_number;
+        end if;
+
+
+        select * bulk collect into aux from camera where id_camera = idc;
+        if sql%notfound then
+            raise no_data_found1;
+        end if;
+    
+        select count(ct.id_client) into total
+        from camera c, hotel h, cazat ct
+        where c.id_camera = idc and c.id_hotel = 31 and c.id_camera = ct.id_camera and c.id_hotel = h.id_hotel;
+        
+        if total = 0 then 
+         raise no_data_found2;
+        else
+            dbms_output.put_line('Numarul de persoane care au fost cazate in aeasta camera este: '||total);
+        end if;
+    exception
+        when no_data_found1 then
+            dbms_output.put_line('Nu exista camera cu id-ul ' || idc);
+            
+        when no_data_found2 then
+            dbms_output.put_line('Nu exista client care sa se fi cazat in camera cu id-ul ' || idc);
+           
+        when negative_number then
+            dbms_output.put_line('Nu sunt permise valori negative!');
+           
+    end;
+    /
+begin
+    exercitiul_8(-1);
+end;
+
+begin
+    exercitiul_8(18206);
+end;
+
+begin
+    exercitiul_8(3206);
+end;
+
+
+--9. Formulați în limbaj natural o problemă pe care să o rezolvați folosind un subprogram stocat independent de tip procedură 
+---care să utilizeze într-o singură comandă SQL 5 dintre tabelele definite. Tratați toate excepțiile care pot apărea, incluzând 
+---excepțiile NO_DATA_FOUND și TOO_MANY_ROWS. Apelați subprogramul astfel încât să evidențiați toate cazurile tratate.
+
+Sa se afiseze numele si prenumele clientului, numarul si facilitatile camerei in care a stat clientul respectiv la un 
+moment dat(se va da data check-in ului ca parametru).
+
+CREATE OR REPLACE PROCEDURE exercitiul_9(v_check_in VARCHAR2) IS
+  v_nume client.nume%type;
+  v_prenume client.prenume%type;
+  v_nr_cam camera.id_camera%type;
+  v_facilitati facilitati.denumire%type;
+  exception1 exception;
+  check_in_date DATE;
+BEGIN
+  IF REGEXP_LIKE(v_check_in, '^\d{2}/\d{2}/\d{4}$') THEN
+    check_in_date := TO_DATE(v_check_in, 'DD/MM/YYYY');
+  
+    SELECT c.nume, c.prenume, cam.nr_camera, f.denumire
+    INTO v_nume, v_prenume, v_nr_cam, v_facilitati
+    FROM client c,istoric i, camera cam, tip_camera tc, facilitati f
+    where i.id_camera = cam.id_camera and i.id_istoric = c.id_istoric and cam.id_tip = tc.id_tip
+          and tc.id_facilitate = f.id_facilitate and i.check_in = check_in_date;
+  
+    DBMS_OUTPUT.PUT_LINE('Numele și prenumele clientului cazat la data specificată: ' || v_nume || ' ' || v_prenume);
+    DBMS_OUTPUT.PUT_LINE('Numărul camerei în care a fost cazat: ' || v_nr_cam);
+    DBMS_OUTPUT.PUT_LINE('Denumirea facilității: ' || v_facilitati);
+  ELSE
+    raise exception1;
+  END IF;
+  
+EXCEPTION
+  WHEN NO_DATA_FOUND THEN
+    DBMS_OUTPUT.PUT_LINE('Nu există niciun client care să se fi cazat la data introdusă!');
+  WHEN TOO_MANY_ROWS THEN
+    DBMS_OUTPUT.PUT_LINE('Sunt prea mulți clienți care s-au cazat la data introdusă!');
+  WHEN exception1 THEN
+    DBMS_OUTPUT.PUT_LINE('Nu ați introdus formatul corect pentru data! Încercați formatul DD/MM/YYYY');
+END exercitiul_9;
+/
+begin
+    exercitiul_9('10/11/2023');
+end;
+
+begin
+    exercitiul_9('01/06/2007');
+end;
+
+begin
+    exercitiul_9('12/10/2006');
+end;
+
+begin
+    exercitiul_9('12/2006');
+end;
+
+
+--10. Definiți un trigger de tip LMD la nivel de comandă. Declanșați trigger-ul.
+
+Definiți un trigger care se declanseaza atunci cand incercam sa facem modificari asupra tabelului angajat intr-o zi nelucratoare.
+
+create or replace trigger exercitiul_10
+    before insert or update or delete on angajat
+begin
+    if(to_char(sysdate, 'DD/MM') = '01/06' or to_char(sysdate, 'DD/MM') = '01/01' or to_char(sysdate, 'DD/MM') = '01/05' or to_char(sysdate, 'DD/MM') = '26/05') 
+        then raise_application_error(-20001, 'In zilele de 1 iunie, 1 ianuarie si 1 mai nu se lucreaza!');
+    end if;
+end;
+/
+
+insert into Angajat values(1120,31, 'incercare', 'incercare', 710, '04/05/2022',10, 2600, '0253416778',180);
+
+
+
+--11. Definiti un trigger de tip LMD la nivel de linie. Declansati trigger-ul.
+
+Definiți un trigger care se declanseaza atunci cand incercam sa facem modificari asupra id-ului unei client.
+/
+create or replace trigger exercitiul_11
+    before update of id_client on client
+    for each row
+    when(new.id_client<>old.id_client)
+begin
+    raise_application_error(-20002, 'Id-ul nu poate fi modificat!');
+end;
+/
+
+update client set id_client = 1;
+
+--12. Definiți un trigger de tip LDD. Declanșați trigger-ul.
+
+Definiti un trigger care sa permita crearea de noi tabele de catre utilizatorul 'EMATIU' decat in ultima zi a lunii curente in intervalul orar 10:00-12:00.
+
+create or replace trigger exercitiul_12
+    before create on schema
+    when (upper(user) = 'EMATIU')
+begin
+    if (sysdate < last_day(sysdate)) then
+        raise_application_error(-20003, 'Baza de date nu poate fi modificata azi!');
+    elsif (to_char(sysdate, 'HH24') not between 10 and 12) then
+        raise_application_error(-20004, 'Baza de date nu poate fi modificata la aceasta ora!');
+    end if;
+end exercitiul_12;
+/
+create table newtable as (select * from hotel);
+drop trigger exercitiul_12;
+
+
+
+--13. Definiți un pachet care să conțină toate obiectele definite în cadrul proiectului.
+
+create or replace package exercitiul_13 is
+    procedure exercitiul_6;
+    procedure exercitiul_7(v_loc in locatie.strada%type);
+    procedure exercitiul_8(idc number);
+    procedure exercitiul_9(v_check_in VARCHAR2);
+end exercitiul_13;
+/
+
+create or replace package body exercitiul_13 is
+    procedure exercitiul_6 is
+        type tablou_indexat is table of angajat%ROWTYPE index by pls_integer;--utilizez acest tip de colectie pt a crea o lista de asocieri intre indici si valori
+    type tablou_imbricat is table of angajat%ROWTYPE;
+    ang_idx tablou_indexat;
+    ang_imb tablou_imbricat;
+
+    begin
+        
+        select a.id_angajat, a.id_hotel, a.nume, a.prenume,  a.job_id, a.data_angajare, a.departament_id, a.salariu, a.nr_tel, a.manager_id
+        bulk collect into ang_idx
+        from angajat a, departamente d
+        where a.departament_id = d.departament_id
+              and lower(d.nume_departament) = 'igiena' and to_char(a.data_angajare, 'YYYY') <= 2015;
+        
+        dbms_output.put_line('Angajatii de la departamentul de Igiena ale caror salarii au fost modificate sunt:');
+        
+        for i in ang_idx.first..ang_idx.last loop
+            update angajat
+            set salariu = salariu * 1.05
+            where id_angajat = ang_idx(i).id_angajat;
+            dbms_output.put_line(' Nume: ' || ang_idx(i).nume || '     Prenume: ' ||ang_idx(i).prenume ||'    Salariu: ' ||ang_idx(i).salariu);
+        end loop;
+        
+        select a.id_angajat, a.id_hotel, a.nume, a.prenume,  a.job_id, a.data_angajare, a.departament_id, a.salariu, a.nr_tel, a.manager_id
+        bulk collect into ang_imb
+        from angajat a
+        where  a.salariu < (select max(salariu)
+                              from angajat ag, departamente d
+                              where ag.departament_id = d.departament_id and lower(d.nume_departament)='igiena')
+             and a.job_id = 713 ;
+              
+        dbms_output.put_line('');
+        dbms_output.put_line('Angajatii de la departamentul Paza  ale caror salarii au fost modificate sunt:');
+        
+        for i in ang_imb.first..ang_imb.last loop
+            update angajat
+            set salariu = salariu * 1.1
+            where id_angajat = ang_imb(i).id_angajat;
+            dbms_output.put_line(' Nume: ' || ang_imb(i).nume || '   Prenume: ' || ang_imb(i).prenume ||'   Salariu: ' || ang_imb(i).salariu);
+        end loop;
+    end exercitiul_6;
+    
+     procedure exercitiul_7(v_loc in locatie.strada%type) is
+     
+        cursor c_hoteluri(v_loc in locatie.strada%type) is
+        select h.nume
+        from hotel h
+        join locatie l on l.id_locatie = h.id_locatie
+        where l.strada = v_loc;
+        
+    
+    cursor c_angajati is
+        select a.nume, a.prenume
+        from  angajat a 
+        join hotel h on a.id_hotel=h.id_hotel
+        join locatie l on l.id_locatie = h.id_locatie
+        where l.strada = v_loc;
+    
+    v_ang c_angajati%rowtype;
+    v_hoteluri c_hoteluri%rowtype;
+    
+begin
+    dbms_output.put_line('Hotelurile localizate pe strada '||v_loc||' din Bucuresti: ');
+    open c_hoteluri(v_loc);
+    loop
+        fetch c_hoteluri into v_hoteluri;
+        exit when c_hoteluri%notfound;
+        dbms_output.put_line('Hotel '|| v_hoteluri.nume);
+    end loop;
+    close c_hoteluri;
+    
+    dbms_output.put_line('--------------Angajati---------------');
+    dbms_output.put_line('');
+    open c_angajati;
+    loop
+        fetch c_angajati into v_ang;
+        exit when c_angajati%notfound;
+        dbms_output.put_line(v_ang.nume||' '||v_ang.prenume);
+    end loop;
+    close c_angajati;
+
+     end;
+     
+        procedure exercitiul_8(idc number) is
+                total number(4);
+    type tbl_idx is table of camera%rowtype index by pls_integer;
+    aux tbl_idx;
+    negative_number exception;
+    no_data_found1 exception;
+    no_data_found2 exception;
+    
+    begin
+        if idc<0 then
+            raise negative_number;
+        end if;
+
+
+        select * bulk collect into aux from camera where id_camera = idc;
+        if sql%notfound then
+            raise no_data_found1;
+        end if;
+    
+        select count(ct.id_client) into total
+        from camera c, hotel h, cazat ct
+        where c.id_camera = idc and c.id_hotel = 31 and c.id_camera = ct.id_camera and c.id_hotel = h.id_hotel;
+        
+        if total = 0 then 
+         raise no_data_found2;
+        else
+            dbms_output.put_line('Numarul de persoane care au fost cazate in aeasta camera este: '||total);
+        end if;
+    exception
+        when no_data_found1 then
+            dbms_output.put_line('Nu exista camera cu id-ul ' || idc);
+            
+        when no_data_found2 then
+            dbms_output.put_line('Nu exista client care sa se fi cazat in camera cu id-ul ' || idc);
+           
+        when negative_number then
+            dbms_output.put_line('Nu sunt permise valori negative!');
+           
+    end;
+    
+    procedure exercitiul_9(v_check_in VARCHAR2) is
+    v_nume client.nume%type;
+  v_prenume client.prenume%type;
+  v_nr_cam camera.id_camera%type;
+  v_facilitati facilitati.denumire%type;
+  exception1 exception;
+  check_in_date DATE;
+BEGIN
+  IF REGEXP_LIKE(v_check_in, '^\d{2}/\d{2}/\d{4}$') THEN
+    check_in_date := TO_DATE(v_check_in, 'DD/MM/YYYY');
+  
+    SELECT c.nume, c.prenume, cam.nr_camera, f.denumire
+    INTO v_nume, v_prenume, v_nr_cam, v_facilitati
+    FROM client c,istoric i, camera cam, tip_camera tc, facilitati f
+    where i.id_camera = cam.id_camera and i.id_istoric = c.id_istoric and cam.id_tip = tc.id_tip
+          and tc.id_facilitate = f.id_facilitate and i.check_in = check_in_date;
+  
+    DBMS_OUTPUT.PUT_LINE('Numele și prenumele clientului cazat la data specificată: ' || v_nume || ' ' || v_prenume);
+    DBMS_OUTPUT.PUT_LINE('Numărul camerei în care a fost cazat: ' || v_nr_cam);
+    DBMS_OUTPUT.PUT_LINE('Denumirea facilității: ' || v_facilitati);
+  ELSE
+    raise exception1;
+  END IF;
+  
+EXCEPTION
+  WHEN NO_DATA_FOUND THEN
+    DBMS_OUTPUT.PUT_LINE('Nu există niciun client care să se fi cazat la data introdusă!');
+  WHEN TOO_MANY_ROWS THEN
+    DBMS_OUTPUT.PUT_LINE('Sunt prea mulți clienți care s-au cazat la data introdusă!');
+  WHEN exception1 THEN
+    DBMS_OUTPUT.PUT_LINE('Nu ați introdus formatul corect pentru data! Încercați formatul DD/MM/YYYY');
+END exercitiul_9;
+
+END exercitiul_13;
+/
+        
+begin 
+    exercitiul_13.exercitiul_6;
+end;
+
+rollback;
